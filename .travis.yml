@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+  - "node"
+  - "12"
+
+script:
+  - "yarn run lint || true"
+  - "yarn run test"
+
+after_success: "yarn run coveralls || true"
