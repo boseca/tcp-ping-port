@@ -3,10 +3,10 @@
 
 name: npm release
 
-on: ["push", "pull_request"]
-# on:
-#   release:
-#     types: [published, edited]
+
+on:
+  release:
+    types: [published, edited]
 
 jobs:
   check:
