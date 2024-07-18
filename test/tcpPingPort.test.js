@@ -99,6 +99,7 @@ describe('Unit: PingPort', function () {
             }
         })
         it('should return timeout error', async function () {
+            this.timeout(10000) // 10sec
             const host = { id: 1, ipv4: 1, ipv6: 1, online: 1, port: 1111, hostname: '1.1.1.1' }
             const result = await tcpPingPort(host.hostname, host.port, { socketTimeout: 3000, dnsTimeout: 1000 })
                 .catch(err => {
@@ -110,6 +111,7 @@ describe('Unit: PingPort', function () {
             }
         })
         it('should return website is online', async function () {
+            const MAX_LATENCY = 3000 // during the testing the latency increases from 15ms to 2s.
             const host = { id: 1, ipv4: 1, ipv6: 0, online: 1, port: 80, hostname: 'google.com' }
             const result = await tcpPingPort(host.hostname, host.port, { socketTimeout: 11000, dnsTimeout: 10000 })
                 .catch(err => {
@@ -117,6 +119,7 @@ describe('Unit: PingPort', function () {
                 })
             if (result) {
                 assertChai.isTrue(result.online, `Expected ${host.hostname} to be online but it was offline.\n${result.error}`)
+                assertChai.isBelow(result.ping, MAX_LATENCY, `Expected ${host.hostname} latency of ${result.ping} to be less than ${MAX_LATENCY}ms.\n${result.error}`)
             }
         })
     })

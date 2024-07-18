@@ -103,7 +103,7 @@ const options = {
     dnsTimeout: 10000,
     dnsServers: '8.8.8.8',  // google DNS
 }
-tcpPingPort("google.com", 80, options).then(({online}) => {
+tcpPingPort("google.com", 80, options).then(({online, ping}) => {
     // ....
 })
 ```
@@ -137,8 +137,8 @@ Attemps to open and close TCP connection
 * hostname `<string>` Host name or an IP address to try to connect to
 * port `<number>` Port number
 * options `<Object>` Socket and Resolver options
-    - socketTimeout `<integer>` Number of miliseconds to wait before the resolving request is canceled. Default value 4000 (4s).
-    - dnsTimeout `<integer>` Number of miliseconds to wait before the resolving request is canceled. Default value 4000 (4s).  
+    - socketTimeout `<integer>` Number of milliseconds to wait before the resolving request is canceled. Default value 4000 (4s).
+    - dnsTimeout `<integer>` Number of milliseconds to wait before the resolving request is canceled. Default value 4000 (4s).  
       Usefull for rare cases when hostnames may need more than default 4 seconds to be resolved.
     - [dnsServers](https://nodejs.org/api/dns.html#dns_dns_setservers_servers) `<string[]>` Array of RFC 5952 formatted addresses. (Example: `['4.4.4.4', '[2001:4860:4860::8888]', '4.4.4.4:1053', '[2001:4860:4860::8888]:1053']`)
  
@@ -147,7 +147,7 @@ Attemps to open and close TCP connection
         - `online`  - indicates if host is online
             - `True`    - when host is online and TCP connection is successfully opened and closed
             - `False`   - when host name is not resolved or it failed to open a TCP connection. Check `Result.error` for details.
-        - `error`   - returns error causing the `host` to be flagged as offline. Useful in verifying the `host` is offline.
+        - `ping`    - returns duration (latency) of the ping in milliseconds.
         - `error`   - returns error causing the `host` to be flagged as offline. Useful in verifying the `host` is offline.
         - `host`    - hostname 
         - `port`    - port

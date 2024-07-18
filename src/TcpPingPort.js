@@ -1,6 +1,7 @@
 // utils
 const net = require('net')
 const fastResolver = require('dns-fast-resolver')
+const { performance } = require('perf_hooks')
 
 const {
     isNumber,
@@ -50,7 +51,7 @@ exports.TcpPingResolverError = class TcpPingResolverError extends this.TcpPingEr
 
 /**
  * @typedef Options
- * @property {number} dnsTimeout Number of miliseconds to wait before resolver times out
+ * @property {number} dnsTimeout Number of milliseconds to wait before resolver times out
  * @property {Array<string>} dnsServers Array of DNS servers to be used to resolve the hostname
  */
 
@@ -60,6 +61,7 @@ exports.TcpPingResolverError = class TcpPingResolverError extends this.TcpPingEr
  * @property {number} port - Port number
  * @property {string} ip - IP address
  * @property {boolean} online - Hostname online status. If false is returned check the error property for details.
+ * @property {number} ping - Duration (latency) of the ping
  * @property {Error} error - Reason why hostname is not online
  */
 
@@ -83,16 +85,17 @@ exports.TcpPingResolverError = class TcpPingResolverError extends this.TcpPingEr
 exports.tcpPingPort = (host, port = 80, options = null, resolver = null) => {
     const destroyTime = (options && options.socketTimeout) || DEFAULT_TIME_OUT
     const resolverOptions = options &&
-        {
-            timeout: options.dnsTimeout,
-            servers: options.dnsServers
-        }
+    {
+        timeout: options.dnsTimeout,
+        servers: options.dnsServers
+    }
     port = port || 80
     const result = {
         host,
         port,
         ip: null,
         online: false,
+        ping: -1,
         error: null
     }
 
@@ -119,6 +122,7 @@ exports.tcpPingPort = (host, port = 80, options = null, resolver = null) => {
         }
 
         try {
+            const pingStart = performance.now()
             socket = net.connect(
                 {
                     host,
@@ -141,6 +145,7 @@ exports.tcpPingPort = (host, port = 80, options = null, resolver = null) => {
             })
             socket.on('connect', (data) => {
                 result.online = true
+                result.ping = (performance.now() - pingStart)
                 closeSocket()
             })
             socket.on('error', err => {
