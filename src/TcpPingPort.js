@@ -9,10 +9,58 @@ const {
 
 const DEFAULT_TIME_OUT = 3000 // 3sec
 
+// #region  errors definitions
+
+// List of some of the error.code values (ref: https://nodejs.org/docs/latest-v12.x/api/errors.html)
+// 'ENOTFOUND'      - DNS Error. No device found at this address!
+// 'ECONNREFUSED'   - No connection could be made because the target machine actively refused it.
+// 'ECONNRESET'     - A connection was forcibly closed by a peer. This normally results from a loss of the connection on the remote socket due to a timeout or reboot. Commonly encountered via the http and net modules.
+// 'ETIMEDOUT'      - A connect or send request failed because the connected party did not properly respond after a period of time.
+// 'EHOSTUNREACH'   - Indicates that the host is unreachable.
+
+exports.TcpPingError = class TcpPingError extends Error {
+    constructor(message) {
+        super(message)
+        this.code = 'TCPPINGERR'
+        this.name = this.constructor.name
+    }
+}
+exports.TcpPingValidationError = class TcpPingValidationError extends this.TcpPingError {
+    constructor(message) {
+        super(message)
+        this.code = 'TCPPINGINVALIDPARAM'
+        this.name = this.constructor.name
+    }
+}
+exports.TcpPingTimeOutError = class TcpPingTimeOutError extends this.TcpPingError {
+    constructor(message) {
+        super(message)
+        this.code = 'TCPPINGTIMEOUT'
+        this.name = this.constructor.name
+    }
+}
+exports.TcpPingResolverError = class TcpPingResolverError extends this.TcpPingError {
+    constructor(message) {
+        super(message)
+        this.code = 'TCPPINGRESOLVEFAIL'
+        this.name = this.constructor.name
+    }
+}
+// #endregion
+
 /**
  * @typedef Options
  * @property {number} dnsTimeout Number of miliseconds to wait before resolver times out
  * @property {Array<string>} dnsServers Array of DNS servers to be used to resolve the hostname
+ */
+
+/**
+ * @typedef {Object} Result
+ * @property {string} host - Hostname or IP
+ * @property {number} port - Port number
+ * @property {string} ip - IP address
+ * @property {boolean} online - Hostname online status. If false is returned check the error property for details.
+ * @property {Error} error - Reason why hostname is not online
  */
 
 /**
@@ -22,7 +70,7 @@ const DEFAULT_TIME_OUT = 3000 // 3sec
  * @param port {number}  Port number
  * @param options {Options}  Socket and Resolver options
  * @param resolver {object}  Resolver to be used for resolving the host
- * @returns {Promise<boolean>}  Promise that will return online status of `host`
+ * @returns {Promise<Result>}  Promise that will return online status of `host` <---- bj: TODO Update Docs
  *  True    when a TCP connection is successfully opened and closed
  *  False   when host name is not resolved or it failed to open a TCP connection
  * @example
@@ -44,12 +92,16 @@ exports.tcpPingPort = (host, port = 80, options = null, resolver = null) => {
         host,
         port,
         ip: null,
-        online: false
+        online: false,
+        error: null
     }
 
     // #region  check parameters
-    if (!isString(host)) { return Promise.resolve(result) }
-    if (!isNumber(port)) { return Promise.resolve(result) }
+    if (!isString(host)) { result.error = new this.TcpPingValidationError('Invalid host') }
+    if (!isNumber(port)) { result.error = new this.TcpPingValidationError('Invalid port') }
+    if (result.error) {
+        return Promise.resolve(result)
+    }
     // #endregion
 
     resolver = resolver || (new fastResolver.FastResolver(resolverOptions))
@@ -80,7 +132,10 @@ exports.tcpPingPort = (host, port = 80, options = null, resolver = null) => {
             )
             socket.setNoDelay(true)
             socket.setKeepAlive(false)
-            socket.setTimeout(destroyTime, closeSocket)
+            socket.setTimeout(destroyTime, () => {
+                result.error = new this.TcpPingTimeOutError(`Socket Timeout of ${destroyTime}ms exceeded.`)
+                closeSocket()
+            })
             socket.on('data', (data) => {
                 socket.end()
             })
@@ -88,18 +143,23 @@ exports.tcpPingPort = (host, port = 80, options = null, resolver = null) => {
                 result.online = true
                 closeSocket()
             })
-            socket.on('error', _err => closeSocket())
+            socket.on('error', err => {
+                result.error = err
+                closeSocket()
+            })
             socket.on('lookup', (err, address, family, lHost) => {
                 family = 4
                 result.ip = address
-                if (err || !address) closeSocket()
+                if (err || !address) {
+                    result.error = err || new this.TcpPingResolverError(`Resolving hostname ${lHost} failed.`)
+                    closeSocket()
+                }
             })
-            socket.on('close', (data, err) => {
+            socket.on('close', (_hadError) => {
                 closeSocket()
                 resolve(result)
             })
         } catch (error) {
-            console.warn('socket connection error:', host, port, error.message)
             closeSocket()
             reject(error)
         }

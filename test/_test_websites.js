@@ -1,14 +1,13 @@
 module.exports = [
     // online
     { ipv4: 1, ipv6: 1, id: 0, online: 1, hostname: 'google.com' },
-    { ipv4: 1, ipv6: 0, id: 1, online: 1, hostname: '172.217.1.174' },
     { ipv4: 1, ipv6: 1, id: 2, online: 1, hostname: 'yahoo.com' },
     { ipv4: 1, ipv6: 0, id: 3, online: 1, hostname: '24h.com.vn' },
     { ipv4: 1, ipv6: 0, id: 4, online: 1, hostname: 'doctissimo.fr' },
     { ipv4: 1, ipv6: 0, id: 5, online: 1, hostname: 'sapo.pt' },
 
     // ECONNREFUSED (online)
-    { ipv4: 1, ipv6: 1, id: 6, online: 1, hostname: 'wikimedia.org' },
+    { ipv4: 1, ipv6: 1, id: 6, online: 0, hostname: '127.0.0.1', port: 2222 },
     // ENOTFOUND    (offline)
     { ipv4: 0, ipv6: 0, id: 7, online: 0, hostname: '17kuxun.com' },
     // EAI_AGAIN    (offline)
@@ -26,10 +25,8 @@ module.exports = [
     { ipv4: 0, ipv6: 0, id: 13, online: 0, hostname: null },
 
     // slow         (online|offline)
-    { ipv4: 1, ipv6: 0, id: 14, online: 1, hostname: 'archive.org' },
     { ipv4: 0, ipv6: 0, id: 15, online: 0, hostname: '5d6d.com' },
     { ipv4: 0, ipv6: 0, id: 16, online: 0, hostname: 'juchang.com' },
-    { ipv4: 0, ipv6: 0, id: 17, online: 0, hostname: 'letitbit.net' },
     { ipv4: 0, ipv6: 0, id: 18, online: 1, hostname: 'aipai.com', skip: 1 },     // very slow > 15sec
 
     // Load balancer (online|offline depeneding of the Load Balancer IP)
