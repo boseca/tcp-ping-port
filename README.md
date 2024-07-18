@@ -89,7 +89,7 @@ Simple examples
 ```js
 const { tcpPingPort } = require("tcp-ping-port")
 
-tcpPingPort("google.com").then(online => {
+tcpPingPort("google.com").then(({online}) => {
     // ....
 })
 ```
@@ -103,10 +103,22 @@ const options = {
     dnsTimeout: 10000,
     dnsServers: '8.8.8.8',  // google DNS
 }
-tcpPingPort("google.com", 80, options).then(online => {
+tcpPingPort("google.com", 80, options).then(({online}) => {
     // ....
 })
 ```
+
+Check if host is offline
+```js
+const { tcpPingPort } = require("tcp-ping-port")
+
+tcpPingPort("google.com").then(result => {
+    if (!result.online && result.error.code === 'TCPPINGTIMEOUT') {
+        // your code when host is not accessible....
+    }
+})
+```
+
 
 
 [back to top](#table-of-contents)
@@ -130,9 +142,16 @@ Attemps to open and close TCP connection
       Usefull for rare cases when hostnames may need more than default 4 seconds to be resolved.
     - [dnsServers](https://nodejs.org/api/dns.html#dns_dns_setservers_servers) `<string[]>` Array of RFC 5952 formatted addresses. (Example: `['4.4.4.4', '[2001:4860:4860::8888]', '4.4.4.4:1053', '[2001:4860:4860::8888]:1053']`)
  
-* returns `<Promise>` Promise that will return online status of `host`
-    - `True`    - when host is online and TCP connection is successfully opened and closed
-    - `False`   - when host name is not resolved or it failed to open a TCP connection
+* returns `<Promise<Result>>` Promise that will return online status of `host`.
+    - `Result` properties
+        - `online`  - indicates if host is online
+            - `True`    - when host is online and TCP connection is successfully opened and closed
+            - `False`   - when host name is not resolved or it failed to open a TCP connection. Check `Result.error` for details.
+        - `error`   - returns error causing the `host` to be flagged as offline. Useful in verifying the `host` is offline.
+        - `error`   - returns error causing the `host` to be flagged as offline. Useful in verifying the `host` is offline.
+        - `host`    - hostname 
+        - `port`    - port
+        - `ip`      - DNS Resolved IP address of the hostname
 
 
 [back to top](#table-of-contents)
@@ -144,7 +163,7 @@ Run all tests
 $ npm test
 ```
 
-Run `ping "google.com:80"` test
+Run individual test `ping "google.com:80"`
 ```
 $ npm run unit-test -- --grep "google.com:80"
 ```
