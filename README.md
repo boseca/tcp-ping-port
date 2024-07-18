@@ -2,8 +2,8 @@
 A simple TCP ping utility to ping a port of an IP or domain. 
 
 [![NPM version](https://img.shields.io/npm/v/tcp-ping-port.svg)](https://www.npmjs.com/package/tcp-ping-port)
-[![Release Status](https://github.com/boseca/tcp-ping-port/workflows/npm%20release/badge.svg)](https://github.com/boseca/tcp-ping-port/releases)
-[![Build Status](https://github.com/boseca/tcp-ping-port/workflows/build/badge.svg)](https://github.com/boseca/tcp-ping-port/actions?query=workflow%3Abuild)
+[![Release Status](https://github.com/boseca/tcp-ping-port/actions/workflows/main.yml/badge.svg)](https://github.com/boseca/tcp-ping-port/releases)
+[![Build Status](https://github.com/boseca/tcp-ping-port/actions/workflows/build.yml/badge.svg)](https://github.com/boseca/tcp-ping-port/actions?query=workflow%3Abuild)
 [![Coverage Status](https://coveralls.io/repos/github/boseca/tcp-ping-port/badge.svg?branch=main)](https://coveralls.io/github/boseca/tcp-ping-port?branch=main)
 
 
