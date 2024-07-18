@@ -8,16 +8,15 @@ const {
 } = require('maketype')
 
 const DEFAULT_TIME_OUT = 3000 // 3sec
-const DEFAULT_IGNORE_CONNECTION_ERRORS = true
 
 // #region  errors definitions
 
 // List of some of the error.code values (ref: https://nodejs.org/docs/latest-v12.x/api/errors.html)
-// "ENOTFOUND"      - DNS Error. No device found at this address!
-// "ECONNREFUSED"   - No connection could be made because the target machine actively refused it.
-// "ECONNRESET"     - A connection was forcibly closed by a peer. This normally results from a loss of the connection on the remote socket due to a timeout or reboot. Commonly encountered via the http and net modules.
-// "ETIMEDOUT"      - A connect or send request failed because the connected party did not properly respond after a period of time. 
-// "EHOSTUNREACH"   - Indicates that the host is unreachable.
+// 'ENOTFOUND'      - DNS Error. No device found at this address!
+// 'ECONNREFUSED'   - No connection could be made because the target machine actively refused it.
+// 'ECONNRESET'     - A connection was forcibly closed by a peer. This normally results from a loss of the connection on the remote socket due to a timeout or reboot. Commonly encountered via the http and net modules.
+// 'ETIMEDOUT'      - A connect or send request failed because the connected party did not properly respond after a period of time.
+// 'EHOSTUNREACH'   - Indicates that the host is unreachable.
 
 exports.TcpPingError = class TcpPingError extends Error {
     constructor(message) {
@@ -98,8 +97,8 @@ exports.tcpPingPort = (host, port = 80, options = null, resolver = null) => {
     }
 
     // #region  check parameters
-    if (!isString(host)) { result.error = new this.TcpPingValidationError("Invalid host") }
-    if (!isNumber(port)) { result.error = new this.TcpPingValidationError("Invalid port") }
+    if (!isString(host)) { result.error = new this.TcpPingValidationError('Invalid host') }
+    if (!isNumber(port)) { result.error = new this.TcpPingValidationError('Invalid port') }
     if (result.error) {
         return Promise.resolve(result)
     }
@@ -147,7 +146,6 @@ exports.tcpPingPort = (host, port = 80, options = null, resolver = null) => {
             socket.on('error', err => {
                 result.error = err
                 closeSocket()
-
             })
             socket.on('lookup', (err, address, family, lHost) => {
                 family = 4
