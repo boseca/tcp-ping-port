@@ -72,15 +72,15 @@ exports.TcpPingResolverError = class TcpPingResolverError extends this.TcpPingEr
  * @param port {number}  Port number
  * @param options {Options}  Socket and Resolver options
  * @param resolver {object}  Resolver to be used for resolving the host
- * @returns {Promise<Result>}  Promise that will return online status of `host` <---- bj: TODO Update Docs
+ * @returns {Promise<Result>}  Promise that will return online status of `host`
  *  True    when a TCP connection is successfully opened and closed
  *  False   when host name is not resolved or it failed to open a TCP connection
  * @example
  * // returns true when host is online
- * const online = await tcpPingPort('google.com');
+ * const {online} = await tcpPingPort('google.com');
  * @example
  * // returns true when host is online and it is resoled in less than 200ms
- * const online = await tcpPingPort('google.com', 80, {dnsTimeout: 200});
+ * const {online} = await tcpPingPort('google.com', 80, {dnsTimeout: 200});
  */
 exports.tcpPingPort = (host, port = 80, options = null, resolver = null) => {
     const destroyTime = (options && options.socketTimeout) || DEFAULT_TIME_OUT
